@@ -1,0 +1,6 @@
+aws-cdk.core
+aws_cdk.aws-ec2
+aws_cdk.aws-ecs
+boto3
+aws-cdk.aws_autoscaling
+simplejson
