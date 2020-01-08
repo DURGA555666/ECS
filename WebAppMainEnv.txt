@@ -1,0 +1,13 @@
+AWS_DEFAULT_REGION	us-west-2
+BASE_DOMAIN	devv4.gravty.info
+BIT_ENGINE_ARN	arn:aws:lambda:us-west-2:384853870836:function:SyncBitProcessor-DEVV4
+BITLY_API_KEY	R_a4f95142746c4f408beb0f4ff5a869fc
+BITLY_LOGIN	bankofloyal
+DATABASE_URL	postgres://gravty:2CXjZNeRuH46@pgbouncer-nlb-devv4-f130e1babbaf3a41.elb.us-west-2.amazonaws.com:6432/gravtydevv4
+DD_SERVICE_NAME	django
+DEPLOY_DATE	2019-12-24T05:59:21Z
+DJANGO_SECRET_KEY	0$bsyd9&6x9zni(+8gcd6@hjqqz44m3l312c1=6xzz)16-3zov
+ENGINE_BIT_KEY	https://engine.devv4.gravty.info/api/bits
+ENGINE_BIT_URL	https://engine.devv4.gravty.info/api/bits
+ENGINE_URL	https://engine.devv4.gravty.info
+ERROR_SQS_QUEUE_URL	

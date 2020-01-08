@@ -501,6 +501,37 @@
               }
             }
           },
+          "ManagedPolicy": {
+            "id": "ManagedPolicy",
+            "path": "ecs/ManagedPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ecs/ManagedPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::ManagedPolicy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": [
+                            "kms:Decrypt",
+                            "secretemanager:GetSecreteValue"
+                          ],
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "",
+                    "managedPolicyName": "Grant_dev",
+                    "path": "/"
+                  }
+                }
+              }
+            }
+          },
           "taskRole": {
             "id": "taskRole",
             "path": "ecs/taskRole",
@@ -517,7 +548,20 @@
                           "Action": "sts:AssumeRole",
                           "Effect": "Allow",
                           "Principal": {
-                            "Service": "ecs-tasks.amazonaws.com"
+                            "Service": [
+                              "ecs-tasks.amazonaws.com",
+                              {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    "ec2.",
+                                    {
+                                      "Ref": "AWS::URLSuffix"
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
                           }
                         }
                       ],
@@ -535,9 +579,159 @@
                             ":iam::aws:policy/AmazonRDSFullAccess"
                           ]
                         ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonSQSFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonS3FullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/CloudWatchFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonDynamoDBFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonRedshiftFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonKinesisFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonSNSFullAccess"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaRole"
+                          ]
+                        ]
+                      },
+                      {
+                        "Ref": "ManagedPolicy7BAB786E"
                       }
                     ],
                     "roleName": "webmaintaskRole"
+                  }
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "ecs/taskRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ecs/taskRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "WebAppMainwebappmainContainerLogGroup58E000B3",
+                                  "Arn"
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "taskRoleDefaultPolicy8002BF36",
+                        "roles": [
+                          {
+                            "Ref": "taskRole4695B131"
+                          }
+                        ]
+                      }
+                    }
                   }
                 }
               }
@@ -555,6 +749,11 @@
                   "aws:cdk:cloudformation:props": {
                     "containerDefinitions": [
                       {
+                        "dockerLabels": {
+                          "com.datadoghq.ad.instances": "[{\"host\": \"%%host%%\", \"port\": 80}]",
+                          "com.datadoghq.ad.check_names": "[\"ecs_fargate\"]",
+                          "com.datadoghq.ad.init_configs": "[{}]"
+                        },
                         "essential": true,
                         "image": "amazon/amazon-ecs-sample",
                         "name": "webapp-mainContainer",
@@ -565,6 +764,18 @@
                             "protocol": "tcp"
                           }
                         ],
+                        "logConfiguration": {
+                          "logDriver": "awslogs",
+                          "options": {
+                            "awslogs-group": {
+                              "Ref": "WebAppMainwebappmainContainerLogGroup58E000B3"
+                            },
+                            "awslogs-stream-prefix": "awslogs",
+                            "awslogs-region": {
+                              "Ref": "AWS::Region"
+                            }
+                          }
+                        },
                         "environment": [
                           {
                             "name": "AWS_DEFAULT_REGION",
@@ -638,61 +849,31 @@
                         ],
                         "environment": [
                           {
-                            "name": "AWS_DEFAULT_REGION",
-                            "value": "us-west-2"
+                            "name": "DD_API_KEY",
+                            "value": "0bb484cee50650fdf4499f6f485f9b57"
                           },
                           {
-                            "name": "BASE_DOMAIN",
-                            "value": "devv4.gravty.info"
+                            "name": "DD_APM_ENABLED",
+                            "value": "true"
                           },
                           {
-                            "name": "BIT_ENGINE_ARN",
-                            "value": "arn:aws:lambda:us-west-2:384853870836:function:SyncBitProcessor-DEVV4"
+                            "name": "DD_APM_ENV",
+                            "value": "devv4"
                           },
                           {
-                            "name": "BITLY_API_KEY",
-                            "value": "R_a4f95142746c4f408beb0f4ff5a869fc"
-                          },
-                          {
-                            "name": "BITLY_LOGIN",
-                            "value": "bankofloyal"
-                          },
-                          {
-                            "name": "DATABASE_URL",
-                            "value": "postgres://gravty:2CXjZNeRuH46@pgbouncer-nlb-devv4-f130e1babbaf3a41.elb.us-west-2.amazonaws.com:6432/gravtydevv4"
-                          },
-                          {
-                            "name": "DD_SERVICE_NAME",
-                            "value": "django"
-                          },
-                          {
-                            "name": "DEPLOY_DATE",
-                            "value": "2019-12-24T05:59:21Z"
-                          },
-                          {
-                            "name": "DJANGO_SECRET_KEY",
-                            "value": "0$bsyd9&6x9zni(+8gcd6@hjqqz44m3l312c1=6xzz)16-3zov"
-                          },
-                          {
-                            "name": "ENGINE_BIT_KEY",
-                            "value": "https://engine.devv4.gravty.info/api/bits"
-                          },
-                          {
-                            "name": "ENGINE_BIT_URL",
-                            "value": "https://engine.devv4.gravty.info/api/bits"
-                          },
-                          {
-                            "name": "ENGINE_URL",
-                            "value": "https://engine.devv4.gravty.info"
-                          },
-                          {
-                            "name": "ERROR_SQS_QUEUE_URL",
-                            "value": ""
+                            "name": "ECS_FARGATE",
+                            "value": "true"
                           }
                         ]
                       }
                     ],
                     "cpu": "256",
+                    "executionRoleArn": {
+                      "Fn::GetAtt": [
+                        "taskRole4695B131",
+                        "Arn"
+                      ]
+                    },
                     "family": "ecsWebAppMain6088A350",
                     "memory": "512",
                     "networkMode": "awsvpc",
@@ -710,7 +891,23 @@
               },
               "webapp-mainContainer": {
                 "id": "webapp-mainContainer",
-                "path": "ecs/WebAppMain/webapp-mainContainer"
+                "path": "ecs/WebAppMain/webapp-mainContainer",
+                "children": {
+                  "LogGroup": {
+                    "id": "LogGroup",
+                    "path": "ecs/WebAppMain/webapp-mainContainer/LogGroup",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ecs/WebAppMain/webapp-mainContainer/LogGroup/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::Logs::LogGroup",
+                          "aws:cdk:cloudformation:props": {}
+                        }
+                      }
+                    }
+                  }
+                }
               },
               "webapp-main_datadog_Container": {
                 "id": "webapp-main_datadog_Container",
